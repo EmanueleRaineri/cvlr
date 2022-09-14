@@ -16,3 +16,6 @@ git show master:cvlr-stats.py > cvlr-stats.py
 git add cvlr-stats.py
 git show master:README.md > README.md
 git add README.md
+git show master:Makefile > Makefile
+git add Makefile
+
