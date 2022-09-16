@@ -7,7 +7,5 @@ cvlr-cluster: cvlr-cluster.c clustering.c
 	gcc -Wall -pedantic -o $@ $< -lm			
 
 cvlr-meth-of-bam: cvlr-meth-of-bam.c cvlrlib.c tree.c
-	gcc -o $@ $(INCLUDE) -fPIC  $< $(LIB)
-
-
+	gcc -o $@ $(INCLUDE) -L$(PREFIX)/lib -fPIC  $< $(LIB)
 
