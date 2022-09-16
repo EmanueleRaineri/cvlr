@@ -10,8 +10,6 @@ those two lines will have to be:
 INCLUDE=-I/home/user/src/htslib/htslib
 LIB=/home/user/src/htslib/libhts.a -lpthread -lz -lcurl -llzma -lbz2 -lcrypto -lm
 
-Also, an [ocaml compiler](https://ocaml.org/learn/tutorials/up_and_running.html) 
-is needed to compile `clvr-stats`.
 Once you have edited the Makefile, just type `make`.
 
 # Usage
