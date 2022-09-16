@@ -9,9 +9,11 @@ git add cvlrlib.c
 git show master:tree.c > tree.c
 git add tree.c
 git show master:cvlr-stats.py > cvlr-stats.py
-git add cvlr-stats.ml
+git add cvlr-stats.py
 git show master:README.md > README.md
 git add README.md
 git show master:Makefile > Makefile
 git add Makefile
+git show master:cvlrcommon.py > cvlrcommon.py
+git add cvlrcommon.py
 
