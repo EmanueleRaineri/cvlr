@@ -1,5 +1,5 @@
 INCLUDE=-I$(PREFIX)/include/htslib
-LIB=$(PREFIX)/lib/libhts.a -lpthread -lz -lcurl -lcrypto -lm -lbz2 -llzma -ldl
+LIB=$(PREFIX)/lib/libhts.a -ldl -lpthread -lz -lcurl -lcrypto -lm -lbz2 -llzma 
 
 all: cvlr-meth-of-bam cvlr-cluster 
 
