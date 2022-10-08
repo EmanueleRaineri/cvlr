@@ -46,13 +46,13 @@ int main(int argc, char* argv[]){
   /* store names of rows and columns */
   char** rnames = malloc(n * sizeof(char*));
   for(i = 0; i < n; i++) rnames[i] = NULL;
-  u_int32_t* gpos = malloc(d * sizeof(u_int32_t));
+  uint32_t* gpos = malloc(d * sizeof(uint32_t));
   for(i = 0; i < d; i++) gpos[i] = 0;
   read_matrix_from_file(infile, n,d, rnames, gpos, m);
   fclose(infile);
   // number of parameters
   fprintf(stdout, "#@N:%lu\n#@D:%lu\n#@K:%d\n", n, d, k);
-  uint df = k * d + k - 1;
+  uint32_t df = k * d + k - 1;
   fprintf(stdout, "#@DF:%d\n", df);
   double* mu = calloc(k * d , sizeof(double));
   double* gamma = malloc(n * k * sizeof(double));
@@ -83,7 +83,7 @@ int main(int argc, char* argv[]){
     }
     fprintf(stdout, "%.3lf\n",mu[i * d + d - 1]);
   }
-  uint it = 0;
+  uint32_t it = 0;
   double ll;
   /* EM loop */
   while (it < maxit){

@@ -105,16 +105,28 @@ def compute_stats(d, k, n0, n1):
                 diff[j,didx] = np.abs(avgmeth[j,l1] - avgmeth[j,l2])
                 didx += 1
     return (avgmeth, meth, diff)
-        
-def print_stats(n0, n1, avgmeth, meth, diff,dgpos):
-    d,k = avgmeth.shape
+
+def median_abs_diff_notna(diff):
+    """
+    return array with median abs diff for each pair of clusters
+    """
+    n, npairs = diff.shape
+    k = int(1+np.sqrt(1+8*npairs))//2
+    madnna = np.full((k,k), fill_value = -1, dtype=float)
     diffidx=0
     for l1 in range(k):
         for l2 in range(l1+1,k):
             notnaidx = np.isfinite(diff[:,diffidx])
-            mnra = np.median(diff[notnaidx, diffidx])
-            print(f"#@MEDIAN_ABS_DIFF_NOTNA_{l1}_{l2}:{mnra:.3f}")
+            madnna[l1,l2] = np.median(diff[notnaidx, diffidx])
             diffidx+=1
+    return madnna
+    
+def print_stats(n0, n1, avgmeth, meth, diff,dgpos):
+    d,k = avgmeth.shape
+    madnna = median_abs_diff_notna(diff)
+    for l1 in range(k):
+        for l2 in range(l1+1,k):
+            print(f"#@MEDIAN_ABS_DIFF_NOTNA_{l1}_{l2}:{madnna[l1,l2]:.3f}")
     for j in range(d):
         print(f"{dgpos[j]}", end="\t")
         for l in range( k ):
@@ -126,7 +138,6 @@ def print_stats(n0, n1, avgmeth, meth, diff,dgpos):
         for l in range(k*(k-1)//2):
             print(f"\t{diff[j,l]:.3f}", end="")
         print()
-
 
 def covmatrix(mu, pi):
     k = mu.shape[0]
@@ -213,20 +224,48 @@ def cov(args):
 
 def randomize(args):
     matrixfn = args.matrixfn
+    nsamples = int(args.nsamples)
     drnames, dgpos, dstate, maxridx, maxgposidx = cvlrcommon.gmatrix_of_file(matrixfn)
     n = maxridx + 1
     d = maxgposidx + 1
     k = 2
-    print(f"#@N:{n}")
-    print(f"#@K:{k}")
-    (nr, cl) = random_clusters(drnames)
-    for i in range(k):
-        print(f"#@POP{i}:{nr[i]}")
-    ( n0, n1 , notfound ) = n0_n1(n, d, k, dstate, drnames, cl)
-    print(f"#@NOTFOUND:{notfound}")
-    ( avg, meth, diff ) = compute_stats(d, k, n0, n1)
-    print_stats(n0, n1,avg,meth, diff, dgpos)
+    for s in range(nsamples):
+        print(f"#@N:{n}")
+        print(f"#@K:{k}")
+        (nr, cl) = random_clusters(drnames)
+        for i in range(k):
+            print(f"#@POP{i}:{nr[i]}")
+        ( n0, n1 , notfound ) = n0_n1(n, d, k, dstate, drnames, cl)
+        print(f"#@NOTFOUND:{notfound}")
+        ( avg, meth, diff ) = compute_stats(d, k, n0, n1)
+        print_stats(n0, n1,avg,meth, diff, dgpos)
 
+def pval(args):
+    clusterfn = args.clusterfn
+    matrixfn = args.matrixfn
+    nsamples = int(args.nsamples)
+    drnames, dgpos, dstate, maxridx, maxgposidx = cvlrcommon.gmatrix_of_file(matrixfn)
+    n = maxridx + 1
+    d = maxgposidx + 1
+    k = 2
+    ## true value
+    (nr, cl) = cvlrcommon.parse_clusters(clusterfn)
+    ( n0, n1 , notfound ) = n0_n1(n, d, k, dstate, drnames, cl)
+    ( avg, meth, diff ) = compute_stats(d, k, n0, n1)
+    madnna_true = median_abs_diff_notna(diff)[0,1]
+    print(f"#@MEDIAN_ABS_DIFF_NOTNA:{madnna_true:.3f}")
+    samples = np.full((nsamples,), fill_value=-1, dtype=float)
+    for s in range(nsamples):
+        (nr, cl) = random_clusters(drnames)
+        ( n0, n1 , notfound ) = n0_n1(n, d, k, dstate, drnames, cl)
+        ( avg, meth, diff ) = compute_stats(d, k, n0, n1)
+        madnna = median_abs_diff_notna(diff)
+        samples[s] = madnna[0,1]
+        print(f"sample[{s}]:{samples[s]}", file=sys.stderr)
+    pval = np.sum(samples > madnna_true) / nsamples
+    print(f"#@PVAL_MADNNA:{pval:.3g}")
+        
+    
 parser     = argparse.ArgumentParser("cvlr-stats")
 subparsers = parser.add_subparsers(help="sub-command help")
 # haplo
@@ -251,7 +290,14 @@ parser_cov.set_defaults(func = cov)
 # randomize
 parser_randomize = subparsers.add_parser("randomize", help="computes stats over randomized (binary) clusters")
 parser_randomize.add_argument("matrixfn",  help="matrix file")
+parser_randomize.add_argument("nsamples",  help="number of samples")
 parser_randomize.set_defaults(func = randomize)
+# pval
+parser_pval = subparsers.add_parser("pval", help="computes pval of median abs diff (k=2)")
+parser_pval.add_argument("clusterfn",  help="cluster file")
+parser_pval.add_argument("matrixfn",  help="matrix file")
+parser_pval.add_argument("nsamples",  help="number of samples")
+parser_pval.set_defaults(func = pval)
 
 
 

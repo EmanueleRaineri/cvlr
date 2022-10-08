@@ -4,7 +4,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <stdint.h>
 
 size_t random_cluster(size_t k){
   // generate a random (uniformly) integer
@@ -83,14 +83,14 @@ void read_n_d_from_file(FILE* infile,  size_t* n, size_t* d){
 }
 
 void read_matrix_from_file(FILE* infile, size_t n, size_t d,
-			   char** rnames, u_int32_t* gpos,
+			   char** rnames, uint32_t* gpos,
 			   int32_t* m){
   size_t readidx, gposidx ;
   char* line = malloc(MAXLINE);
   char* rname = malloc(MAXLINE);
-  u_int32_t tmpgpos;
+  uint32_t tmpgpos;
   int status;
-  uint cgcount=0;
+  uint32_t cgcount=0;
   while(1) {
     line = fgets(line, MAXLINE, infile);
     if ( NULL == line && feof(infile) ) {

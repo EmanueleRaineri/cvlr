@@ -61,10 +61,9 @@ int main (int argc, char* argv[]){
 
   bool cgmatch;
   
-  int i, j, n, mpos, npos, tid_out = -1, ismeth;
+  int i, j, n, npos, tid_out = -1, ismeth;
   int* meth = malloc(MAXCGCOUNT * sizeof(int));
-  int* idxrname = malloc(1000*sizeof(int));
-
+  
   size_t cgcount = 0, nreads = 0, *idxread = malloc(MAXCGCOUNT*sizeof(size_t));
 
   struct pos_tnode* gpostree = NULL;
