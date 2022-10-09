@@ -52,7 +52,7 @@ int main (int argc, char* argv[]){
   uint  cg_in_read; 
   uint64_t minpos, maxpos, span;
 
-  int32_t l_qseq;
+  //int32_t l_qseq;
   int32_t *rpos = malloc(MAXREADLE * sizeof(int32_t));
   /**< positions on the read which match the genome */
   int64_t *gpos = malloc(MAXREADLE * sizeof(int64_t));;
@@ -94,7 +94,11 @@ int main (int argc, char* argv[]){
     goto err;
   }
   regout = sam_parse_region(hdr, region, &tid_out, &start, &end, 0);
-  fprintf(stderr, "region %s (tid_out:%d start:%ld end:%ld)\n",
+  if (!regout) {
+    fprintf(stderr, "fatal: can't parse region\n");
+    goto err;
+  }
+  fprintf(stderr, "region %s (tid_out:%d start:%"PRId64" end:%"PRId64")\n",
 	  region, tid_out, start, end);
   iter = sam_itr_querys(idx, hdr, region);
   if ( !iter ){
@@ -103,7 +107,8 @@ int main (int argc, char* argv[]){
   }
   /** extract reads overlapping with the selected region */
   while ( sam_itr_next(fp, iter, b) >= 0 ){
-    isrev = bam_is_rev(b); rname = bam_get_qname(b); l_qseq = b->core.l_qseq;
+    isrev = bam_is_rev(b); rname = bam_get_qname(b);
+    //l_qseq = b->core.l_qseq;
     if (b->core.flag & (BAM_FUNMAP | BAM_FSECONDARY | BAM_FSUPPLEMENTARY | BAM_FQCFAIL | BAM_FDUP)) {
       fprintf(stderr, "skipping %s [flag:%d]\n", rname,b->core.flag );
       continue;
@@ -158,7 +163,7 @@ int main (int argc, char* argv[]){
       meth[cgcount] = binarize(ismeth, 127,127);
       /* debug info */
       if (DEBUG){
-	fprintf(stderr, "%ld\t%s\t%d\t%ld\t%c\t%d\t", cgcount, rname,
+	fprintf(stderr, "%ld\t%s\t%d\t%"PRId64"\t%c\t%d\t", cgcount, rname,
 		rpos[i], gpos[i], nuc1, n);
 	if (n > 0) {
 	  fprintf(stderr, "%c\t%c\t%s\t%d\n",
@@ -192,12 +197,12 @@ int main (int argc, char* argv[]){
    not covered by all reads
   */
   fprintf(stdout, "#@N:%ld\n#@D:%d\n", nreads, npos );
-  fprintf(stdout, "#@MINPOS:%ld\n#@MAXPOS:%ld\n#@SPAN:%ld\n",
+  fprintf(stdout, "#@MINPOS:%"PRIu64"\n#@MAXPOS:%"PRIu64"\n#@SPAN:%ld\n",
 	  minpos, maxpos, span);
   fprintf(stdout, "#@REGION:%s\n", region);
   fprintf(stdout, "#@CGCOUNT:%lu\n", cgcount);
   for(i=0; i< cgcount; i++){
-      fprintf(stdout, "%ld\t%s\t%d\t%ld\t%d\n",
+      fprintf(stdout, "%ld\t%s\t%d\t%"PRId64"\t%d\n",
 	      idxread[i], rnames[i],
 	      pos_index_of(gpostree, allgpos[i]),
 	      allgpos[i], meth[i]);

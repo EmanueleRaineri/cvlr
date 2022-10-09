@@ -16,7 +16,7 @@ struct pos_tnode{
 void pos_treeprint(struct pos_tnode *p){
   if (p != NULL) {
     pos_treeprint(p->left);
-    printf("@%lu %u %lu\n", p->pos, p->count, p->index );
+    printf("@%"PRIu64" %u %"PRIu64"\n", p->pos, p->count, p->index );
     pos_treeprint(p->right);
   }
 }
@@ -103,7 +103,7 @@ struct rname_tnode{
 void rname_treeprint(struct rname_tnode *p){
   if (p != NULL) {
     rname_treeprint(p->left);
-    printf("@%s %u %lu\n", p->rname, p->count, p->index );
+    printf("@%s %u %"PRIu64"\n", p->rname, p->count, p->index );
     rname_treeprint(p->right);
   }
 }

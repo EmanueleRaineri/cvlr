@@ -114,7 +114,7 @@ void create_rname_pos_trees(char* fname,
   int64_t gpos;
   int64_t meth;
   while(1){
-    fscanf(fp, "%s\t%c\t%u\t%ld\t%ld\n",
+    fscanf(fp, "%s\t%c\t%u\t%"SCNd64"\t%"SCNd64"\n",
 	   rname, &isrev, &rpos, &gpos, &meth);
     *pos_root = pos_addtree(*pos_root, gpos);
     *rname_root = rname_addtree(*rname_root, rname);
@@ -145,7 +145,7 @@ void make_matrix_from_file_trees(int32_t* mm, size_t nr, size_t npos,
   int64_t meth;
   int i, j;
   while(1){
-    fscanf(fp, "%s\t%c\t%u\t%ld\t%ld\n",
+    fscanf(fp, "%s\t%c\t%u\t%"SCNd64"\t%"SCNd64"\n",
 	   rname, &isrev, &rpos, &gpos, &meth);
     i = rname_index_of(rname_root, rname);
     if ( -1 == i ) {
@@ -154,7 +154,7 @@ void make_matrix_from_file_trees(int32_t* mm, size_t nr, size_t npos,
     }
     j = pos_index_of(pos_root, gpos);
     if ( -1 == j ) {
-      fprintf(stderr, "pos:%lu not found\n", gpos);
+      fprintf(stderr, "pos:%"PRId64" not found\n", gpos);
       exit(1);
     }
     mm[i * npos + j ] = (int)(meth > 127)?1:0;
@@ -169,8 +169,8 @@ void make_matrix_from_file(char *fname, uint64_t* n, uint64_t* d){
   create_rname_pos_trees(fname, &pos_root, &rname_root );
   *n = rname_index(rname_root, 0);
   *d = pos_index(pos_root, 0);
-  printf("%lu unique reads\n", *n);
-  printf("%lu unique position(s)\n", *d);
+  printf("%"PRId64" unique reads\n", *n);
+  printf("%"PRId64" unique position(s)\n", *d);
   int32_t* mm = calloc( (*n) * (*d) , sizeof(int32_t));
   make_matrix_from_file_trees(mm, *n, *d, fname, rname_root, pos_root);
 }
