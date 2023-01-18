@@ -25,7 +25,7 @@ def parse_clusters(clusterfn):
             if ( m != None ):
                 k = int(m.groups(0)[0])
     if ( -1 == k ):
-        print(f"#@K mmissing from header", file=sys.stderr)
+        print(f"#@K missing from header", file=sys.stderr)
         sys.exit(1)
     ## parse clusters
     ## nr contains the number of reads in each cluster
@@ -41,6 +41,8 @@ def parse_clusters(clusterfn):
         nr[cln] = nr[cln] + 1
     f.close()
     return (nr, cl)
+
+
 
 def gmatrix_of_file(matrixfn):
     """ 

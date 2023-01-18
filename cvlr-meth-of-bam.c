@@ -50,7 +50,7 @@ int main (int argc, char* argv[]){
   /** number of useful CGs in a given read. 
       (useful == in window and matching properly, see below) */
   uint  cg_in_read; 
-  uint64_t minpos, maxpos, span;
+  uint64_t minpos, maxpos, span, discarded=0;
 
   //int32_t l_qseq;
   int32_t *rpos = malloc(MAXREADLE * sizeof(int32_t));
@@ -105,12 +105,14 @@ int main (int argc, char* argv[]){
     fprintf(stderr, "fatal: empty sam_itr_querys\n");
     goto err;
   }
+  
   /** extract reads overlapping with the selected region */
   while ( sam_itr_next(fp, iter, b) >= 0 ){
     isrev = bam_is_rev(b); rname = bam_get_qname(b);
     //l_qseq = b->core.l_qseq;
     if (b->core.flag & (BAM_FUNMAP | BAM_FSECONDARY | BAM_FSUPPLEMENTARY | BAM_FQCFAIL | BAM_FDUP)) {
-      fprintf(stderr, "skipping %s [flag:%d]\n", rname,b->core.flag );
+      fprintf(stderr, "discarding %s [flag:%d]\n", rname,b->core.flag );
+      discarded++;
       continue;
     }
     //fprintf(stderr, "processing %s\n", rname);
@@ -201,6 +203,7 @@ int main (int argc, char* argv[]){
 	  minpos, maxpos, span);
   fprintf(stdout, "#@REGION:%s\n", region);
   fprintf(stdout, "#@CGCOUNT:%lu\n", cgcount);
+  fprintf(stdout, "#@DISCARDED_READS:"PRIu64"\n", discarded);
   for(i=0; i< cgcount; i++){
       fprintf(stdout, "%ld\t%s\t%d\t%"PRId64"\t%d\n",
 	      idxread[i], rnames[i],
