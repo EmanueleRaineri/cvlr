@@ -1,4 +1,4 @@
-PREFIX=/home/emanuele/src
+PREFIX=${HOME}/src
 INCLUDE=-I$(PREFIX)/htslib/htslib
 LIB= $(PREFIX)/htslib/libhts.a -lpthread -lz -lcurl -llzma -lbz2 -lcrypto -lm
 

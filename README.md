@@ -4,19 +4,27 @@ cvlr depends on [htslib](https://github.com/samtools/htslib).
 You need to install it and write the relevant path in the Makefile.
 Specifically look at the lines starting with INCLUDE and LIB.
 If you have installed htslib in the directory
-/home/user/src/htslib`
+`/home/user/src/htslib`
 those two lines will have to be:
 
+```
 INCLUDE=-I/home/user/src/htslib/htslib
 LIB=/home/user/src/htslib/libhts.a -lpthread -lz -lcurl -llzma -lbz2 -lcrypto -lm
+```
+
+
+The htslib has to be recent enough as to contain functions to parse
+the Mm/Ml tags. I don't know what the oldest useful version is,
+but I'm sure 1.16 works.
 
 Once you have edited the Makefile, just type `make`.
 
 # Usage
 
 You need to have a BAM/CRAM file containing methylation data
-encoded with the Mm/Ml tages as explained in the SAM documentation
-(https://samtools.github.io/hts-specs/SAMtags.pdf). This is also the standard output
+encoded with the Mm/Ml tags as explained in the SAM documentation
+(https://samtools.github.io/hts-specs/SAMtags.pdf).
+This is also the standard output
 format (at the moment) of Nanopore's Megalodon.
 First you create the matrix from the BAM file with
 
