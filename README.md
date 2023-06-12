@@ -29,7 +29,7 @@ This is also the standard output
 format (at the moment) of Nanopore's Megalodon.
 First you create the matrix from the BAM file with
 
-`cvlr-meth-of-bam NA12878.cram chr20:58839718-5891119 > GNAS-matrix.txt`
+`cvlr-meth-of-bam NA12878.cram chr20:58850594-58852978  > GNAS-matrix.txt`
 
 then you cluster the reads with
 
@@ -40,7 +40,7 @@ a maximum of 100 EM iterations).
 
 You can then look at the clusters (for example for plotting the methylation values) with
 
-`cvlr-stats GNAS-clusters.txt GNAS-matrix.txt > GNAS-stats.txt`
+`cvlr-stats.py GNAS-clusters.txt GNAS-matrix.txt > GNAS-stats.txt`
 
 If you have 2 clusters columns 1,4,7 of contain the genomic position,
 methylation in cluster 0 and methylation in cluster 1 respectively.
