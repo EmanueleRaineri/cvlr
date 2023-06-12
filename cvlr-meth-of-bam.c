@@ -203,7 +203,7 @@ int main (int argc, char* argv[]){
 	  minpos, maxpos, span);
   fprintf(stdout, "#@REGION:%s\n", region);
   fprintf(stdout, "#@CGCOUNT:%lu\n", cgcount);
-  fprintf(stdout, "#@DISCARDED_READS:"PRIu64"\n", discarded);
+  fprintf(stdout, "#@DISCARDED_READS:%"PRIu64"\n", discarded);
   for(i=0; i< cgcount; i++){
       fprintf(stdout, "%ld\t%s\t%d\t%"PRId64"\t%d\n",
 	      idxread[i], rnames[i],
