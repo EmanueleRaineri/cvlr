@@ -17,6 +17,7 @@ The htslib has to be recent enough as to contain functions to parse
 the Mm/Ml tags. I don't know what the oldest useful version is,
 but I'm sure 1.16 works.
 
+
 Once you have edited the Makefile, just type `make`.
 
 # Usage
