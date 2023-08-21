@@ -29,7 +29,23 @@ def g(a1, b1, a2, b2):
 
 def betadiff(n01, n11, n02, n12):
     return g((n11+1), (n01+1), (n12+1), (n02+1))
-    
+
+def rnd_madnna(n0, n1):
+    d = n0.shape[1]
+    n = (n0 + n1).sum(0)
+    diff = np.zeros(d)
+    for j in range(d):
+        pk0 = n1[0 , j] / n[j]
+        pk1 = n1[1 , j] / n[j]
+        n1k0 = np.random.binomial(n[j], pk0)
+        n1k1 = np.random.binomial(n[j], pk1)
+        n0k0 = n[j] - n1k0
+        n0k1 = n[j] - n1k1
+        meth0 = n1k0 / ( n0k0 + n1k0 )
+        meth1 = n1k1 / ( n0k1 + n1k1 )
+        diff[j] = np.abs(meth0 - meth1) 
+    return np.median(diff[np.isfinite(diff)])
+
 def n0_n1(n, d, k, dstate, drnames, cl):
     """
     returns 2 arrays n0, n1 (k,d)
@@ -155,7 +171,7 @@ def print_stats(n0, n1, avgmeth, meth, diff,postprob, dgpos, dmrt):
     format:
     #@DMR_c1_c2_\d+:<DMR start, stop, median abs diff>
     """
-    d,k = avgmeth.shape
+    d, k = avgmeth.shape
     madnna = median_abs_diff_notna(diff)
     for l1 in range(k):
         for l2 in range(l1+1,k):
@@ -301,6 +317,10 @@ def randomize(args):
         print_stats(n0, n1,avg,meth, diff, postprob, dgpos)
 
 def pval(args):
+    """
+    computes empirical p value by permutation testing.
+    works for k = 2.
+    """
     clusterfn = args.clusterfn
     matrixfn = args.matrixfn
     nsamples = int(args.nsamples)
@@ -311,17 +331,14 @@ def pval(args):
     ## true value
     (nr, cl) = cvlrcommon.parse_clusters(clusterfn)
     ( n0, n1 , notfound ) = n0_n1(n, d, k, dstate, drnames, cl)
-    ( avg, meth, diff ) = compute_stats(d, k, n0, n1)
+    ( avg, meth, diff, postprob ) = compute_stats(d, k, n0, n1)
     madnna_true = median_abs_diff_notna(diff)[0,1]
     print(f"#@MATRIXFN:{matrixfn}")
     print(f"#@MEDIAN_ABS_DIFF_NOTNA:{madnna_true:.3f}")
+    print(f"#@N:{n}")
     samples = np.full((nsamples,), fill_value=-1, dtype=float)
     for s in range(nsamples):
-        (nr, cl) = random_clusters(drnames)
-        ( n0, n1 , notfound ) = n0_n1(n, d, k, dstate, drnames, cl)
-        ( avg, meth, diff ) = compute_stats(d, k, n0, n1)
-        madnna = median_abs_diff_notna(diff)
-        samples[s] = madnna[0,1]
+        samples[s] = rnd_madnna(n0, n1)
         print(f"sample[{s}]:{samples[s]}", file=sys.stderr)
     pval = np.sum(samples > madnna_true) / nsamples
     print(f"#@PVAL_MADNNA:{pval:.3g}")

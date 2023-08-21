@@ -1,0 +1,9 @@
+REGION=chr6_28500000-28505000
+CLUSTERFN=${METH3D}/asm/AY7483/AY7483-clusters-${REGION}.txt
+MATRIXFN=${METH3D}/asm/AY7483/AY7483-matrix-${REGION}.txt
+./cvlr-stats.py pval ${CLUSTERFN} ${MATRIXFN} 1000
+
+## old version on chr6:29440000-29445000
+## PVAL 0.047
+## time : 7.95
+
