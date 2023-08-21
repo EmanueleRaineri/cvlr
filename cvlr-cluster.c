@@ -41,6 +41,7 @@ int main(int argc, char* argv[]){
   size_t i,j, n,d;
   read_n_d_from_file(infile, &n, &d);
   fprintf(stderr, "n:%lu d:%lu\n", n, d);
+  /* matrix to be clustered */
   int32_t* m = malloc(n * d * sizeof(int32_t));
   for(i = 0; i < n * d; i++) m[i] = -1;
   /* store names of rows and columns */
@@ -58,7 +59,8 @@ int main(int argc, char* argv[]){
   double* gamma = malloc(n * k * sizeof(double));
   double* pi = calloc(k , sizeof(double));
   double* pop = malloc(k * sizeof(double));
-  //double s = 0.0;
+  /* counts after final cluster assignment */
+  uint* clusterpop = calloc(k, sizeof(uint)); 
   size_t* cluster = malloc(n * sizeof(size_t));
   for (i = 0; i < n; i++){
     cluster[i] = random_cluster(k);
@@ -67,7 +69,7 @@ int main(int argc, char* argv[]){
   size_t* n1 = calloc(k*d, sizeof(size_t));
   fill_n0_n1(m, cluster, n, d, k, n0, n1);
   init_pi(cluster, n, k, pi);
-  init_mu(n0,n1,k,d,mu);
+  init_mu(n0, n1, k, d, mu);
   fprintf(stdout, "#@INITPI:");
   for(i = 0; i < (k-1); i++) fprintf(stdout, "%.3lf\t", pi[i]);
   fprintf(stdout, "%.3lf\n", pi[k-1]);
@@ -101,9 +103,9 @@ int main(int argc, char* argv[]){
   fprintf(stdout, "#@PI:");
   for(i=0; i< (k-1); i++) fprintf(stdout, "%.3lf\t", pi[i]);
   fprintf(stdout, "%.3lf\n", pi[k-1]);
-  for(i=0; i<k; i++){
+  for(i=0; i < k; i++){
     fprintf(stdout, "#@MU%ld:",i);
-    for(j=0; j<(d-1);j++){
+    for(j=0; j < (d-1); j++){
       fprintf(stdout, "%.3lf\t",mu[i*d+j]);
     }
     fprintf(stdout, "%.3lf\n",mu[i*d+d-1]);
@@ -115,6 +117,7 @@ int main(int argc, char* argv[]){
       if (gamma[i*k+j] > maxg) {
 	maxg = gamma[i*k+j];
 	cluster[i] = j;
+	clusterpop[j]+=1;
       }
     }
     fprintf(stdout,"%ld\t", cluster[i]);
@@ -123,11 +126,16 @@ int main(int argc, char* argv[]){
     }
     fprintf(stdout, "%.3g\n", gamma[i*k+k-1]);
   }
+  for(j=0; j < k;j++){
+    fprintf(stdout,"#@POP%ld=%u\n", j, clusterpop[j]);
+  }
   free(m);
   free(mu);
   free(pi);
   free(rnames);
   free(gpos);
+  free(pop);
+  free(clusterpop);
   clock_t end = clock();
   fprintf(stderr, "cvlr-cluster done in %.3gs\n", (double)(end-begin)/CLOCKS_PER_SEC);
   exit(EXIT_SUCCESS);
